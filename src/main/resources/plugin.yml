@@ -1,0 +1,6 @@
+name: CrystaliaBosses
+version: '1.0'
+main: me.vrxdev.crystaliaBosses.CrystaliaBosses
+api-version: '1.21'
+authors: [ VRXDev ]
+website: https://vrxdev.xyz/
