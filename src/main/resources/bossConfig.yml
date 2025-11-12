@@ -1,0 +1,14 @@
+cursed_beast:
+  cooldown: 3600
+  summonItem:
+    name: "Cursed Beast"
+    material: FERMENTED_SPIDER_EYE
+    lore:
+      - ""
+  drops:
+    - "mythicmobs;cursed_spear;1|0.2"
+    - "mythicmobs;cursed_scythe;1|0.1"
+    - "diamond;10|0.6"
+    - "diamond;24|0.45"
+    - "netherite_ingot;2|0.4"
+    - "mythicmobs;cursed_hammer;1|0.05"

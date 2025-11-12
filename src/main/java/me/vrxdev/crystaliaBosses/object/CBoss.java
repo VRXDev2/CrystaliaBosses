@@ -4,8 +4,11 @@ import dev.lone.itemsadder.api.CustomStack;
 import io.lumine.mythic.api.MythicProvider;
 import io.lumine.mythic.bukkit.adapters.BukkitItemStack;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,19 +24,25 @@ public class CBoss {
     private final List<String> lore;
     public boolean announceKill = false;
 
+    public final int initialCooldown;
+    public int cooldown = 0;
+
     private final ItemStack summonItem;
     private final List<String> drops;
 
-    public CBoss(String id, String name, Material material, List<String> lore, List<String> drops) {
+    public CBoss(Plugin plugin, String id, int cooldown, String name, Material material, List<String> lore, List<String> drops) {
         this.id = id;
         this.material = material;
         this.lore = lore;
+
+        this.initialCooldown = cooldown;
 
         summonItem = new ItemStack(material);
         ItemMeta meta = summonItem.getItemMeta();
         if (meta != null) {
             meta.setItemName(fixColor(name));
             meta.setLore(fixLore(lore));
+            meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "id"), PersistentDataType.STRING, this.id);
 
             summonItem.setItemMeta(meta);
         }
@@ -50,20 +59,30 @@ public class CBoss {
 
         for (String data : drops) {
             String[] split = data.split("\\|");
-            if (split.length != 2) continue;
-
+            if (split.length != 2) {
+                logMessage("&cInvalid drop data: " + data + " - missing chance <data>:<double>");
+                continue;
+            }
             String itemData = split[0];
+            ItemStack item = parseItem(itemData);
+            if (item == null) {
+                logMessage("&cInvalid item data: " + data);
+                continue;
+            }
+
             double chance = parseDoubleSafe(split[1]);
             double random = Math.random();
             if (random > chance) continue;
 
-            parsedDrops.add(parseItem(itemData));
+            parsedDrops.add(item);
         }
 
         return parsedDrops;
     }
 
-
+    // diamond
+    // diamond;11
+    // mythicmobs;bloodmoon_scythe;1
     public ItemStack parseItem(String data) {
         String[] split = data.split(";");
         if (split.length == 0) return null;
